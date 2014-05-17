@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- ScpControl Configuration Data. 5/12/2014 1:29:56 PM -->
+
+<ScpControl>
+  <flushHIDQueue>True</flushHIDQueue>
+  <idleDisconnectTimeout>0</idleDisconnectTimeout>
+  <Red>0</Red>
+  <Green>64</Green>
+  <Blue>128</Blue>
+  <RumbleBoost>100</RumbleBoost>
+  <ledAsBatteryIndicator>False</ledAsBatteryIndicator>
+  <lowBatteryFlash>False</lowBatteryFlash>
+  <touchSensitivity>0</touchSensitivity>
+  <LowRed>50</LowRed>
+  <LowGreen>60</LowGreen>
+  <LowBlue>36</LowBlue>
+  <touchpadJitterCompensation>True</touchpadJitterCompensation>
+  <lowerRCOn>False</lowerRCOn>
+  <tapSensitivity>100</tapSensitivity>
+  <doubleTap>True</doubleTap>
+  <scrollSensitivity>0</scrollSensitivity>
+  <LeftTriggerMiddle>0.5</LeftTriggerMiddle>
+  <RightTriggerMiddle>0.5</RightTriggerMiddle>
+  <ButtonMouseSensitivity>50</ButtonMouseSensitivity>
+  <Rainbow>0</Rainbow>
+  <Control>
+    <Button>
+      <bnTouchUpper>Left Mouse Button</bnTouchUpper>
+      <bnTouchLeft>Back</bnTouchLeft>
+      <bnTouchRight>Back</bnTouchRight>
+      <bnTouchMulti>Back</bnTouchMulti>
+    </Button>
+    <Key>
+      <bnShare>116</bnShare>
+    </Key>
+  </Control>
+</ScpControl>

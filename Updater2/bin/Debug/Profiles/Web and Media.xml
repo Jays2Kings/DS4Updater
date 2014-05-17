@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- ScpControl Configuration Data. 5/13/2014 10:59:30 PM -->
+
+<ScpControl>
+  <flushHIDQueue>False</flushHIDQueue>
+  <idleDisconnectTimeout>0</idleDisconnectTimeout>
+  <Red>43</Red>
+  <Green>0</Green>
+  <Blue>0</Blue>
+  <RumbleBoost>100</RumbleBoost>
+  <ledAsBatteryIndicator>False</ledAsBatteryIndicator>
+  <lowBatteryFlash>False</lowBatteryFlash>
+  <touchSensitivity>100</touchSensitivity>
+  <LowRed>0</LowRed>
+  <LowGreen>0</LowGreen>
+  <LowBlue>0</LowBlue>
+  <touchpadJitterCompensation>True</touchpadJitterCompensation>
+  <lowerRCOn>False</lowerRCOn>
+  <tapSensitivity>100</tapSensitivity>
+  <doubleTap>True</doubleTap>
+  <scrollSensitivity>5</scrollSensitivity>
+  <LeftTriggerMiddle>0.5</LeftTriggerMiddle>
+  <RightTriggerMiddle>0.5</RightTriggerMiddle>
+  <ButtonMouseSensitivity>50</ButtonMouseSensitivity>
+  <Rainbow>0</Rainbow>
+  <Control>
+    <Button>
+      <bnTouchUpper>Middle Mouse Button</bnTouchUpper>
+      <bnTouchLeft>Left Mouse Button</bnTouchLeft>
+      <bnTouchRight>Right Mouse Button</bnTouchRight>
+      <bnTouchMulti>Middle Mouse Button</bnTouchMulti>
+      <bnR1>5th Mouse Button</bnR1>
+      <bnL1>4th Mouse Button</bnL1>
+      <bnL3>Left Mouse Button</bnL3>
+      <bnLSUp>Mouse Wheel Up</bnLSUp>
+      <bnLSDown>Mouse Wheel Down</bnLSDown>
+    </Button>
+    <Key>
+      <bnCross>13</bnCross>
+      <bnCircle>173</bnCircle>
+      <bnSquare>74</bnSquare>
+      <bnTriangle>75</bnTriangle>
+      <bnUp>38</bnUp>
+      <bnDown>40</bnDown>
+      <bnL2>17</bnL2>
+      <bnRight>39</bnRight>
+      <bnR2>16</bnR2>
+      <bnLeft>37</bnLeft>
+      <bnOptions>116</bnOptions>
+      <bnShare>91</bnShare>
+      <bnRSDown>174</bnRSDown>
+      <bnRSUp>175</bnRSUp>
+      <bnLSLeft>33</bnLSLeft>
+      <bnRSRight>176</bnRSRight>
+      <bnLSRight>34</bnLSRight>
+      <bnRSLeft>177</bnRSLeft>
+      <bnR3>179</bnR3>
+    </Key>
+  </Control>
+</ScpControl>
