@@ -82,9 +82,9 @@ namespace Updater2
             }
 
             if (processes.Length > 0)
-                if (MessageBox.Show("It must be closed to update.", "DS4Tool is still running", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation) == MessageBoxResult.OK)
+                if (MessageBox.Show("It will be closed to contine this update.", "DS4Tool is still running", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation) == MessageBoxResult.OK)
                     for (int i = processes.Length - 1; i >= 0; i--)
-                        processes[i].CloseMainWindow();
+                        processes[i].Kill();
                 else
                     this.Close();
         }
@@ -130,7 +130,7 @@ namespace Updater2
             File.Delete(path + "\\version.txt");
             File.Delete(path + "\\Update.zip");
             if (File.Exists("Updater NEW.exe"))
-                label1.Content = "New Updater in program folder, close this to finish update.";
+                label1.Content = "New Updater found, close this to finish update.";
             else
                 label1.Content = "Update complete";
             Save();
