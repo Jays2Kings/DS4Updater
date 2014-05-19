@@ -129,10 +129,7 @@ namespace Updater2
             catch (IOException) { } //Since profiles may be in the zip ignore them if already exists
             File.Delete(path + "\\version.txt");
             File.Delete(path + "\\Update.zip");
-            if (File.Exists("Updater NEW.exe"))
-                label1.Content = "New Updater found, close this to finish update.";
-            else
-                label1.Content = "Update complete";
+            label1.Content = "Update complete";
             Save();
             UpdaterBar.Value = 106;
             TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
