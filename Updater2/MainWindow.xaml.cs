@@ -30,7 +30,6 @@ namespace Updater2
     {
         WebClient wc = new WebClient();
         protected string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Tool";
-        Process[] processes = Process.GetProcessesByName("DS4Tool");
         double version, newversion;
         protected String m_Profile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Tool\\Profiles.xml";
         protected XmlDocument m_Xdoc = new XmlDocument();
@@ -79,14 +78,7 @@ namespace Updater2
                 label1.Content = "DS4Tool is up to date";
                 File.Delete(path + "\\version.txt");
                 btnOpenDS4.IsEnabled = true;
-            }
-
-            if (processes.Length > 0)
-                if (MessageBox.Show("It will be closed to contine this update.", "DS4Tool is still running", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation) == MessageBoxResult.OK)
-                    for (int i = processes.Length - 1; i >= 0; i--)
-                        processes[i].Kill();
-                else
-                    this.Close();
+            }            
         }
 
         Stopwatch sw = new Stopwatch();
@@ -114,10 +106,26 @@ namespace Updater2
         private void wc_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
             sw.Reset();
+            Process[] processes = Process.GetProcessesByName("DS4Tool");
+            Process[] processes2 = Process.GetProcessesByName("DS4Windows");
+            label1.Content = "Download Complete";
+            if (processes.Length > 0 || processes2.Length > 0)
+                if (MessageBox.Show("It will be closed to contine this update.", "DS4Tool/DS4Windows is still running", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation) == MessageBoxResult.OK)
+                {
+                    foreach (Process p in processes)
+                        p.Kill();
+                    foreach (Process p in processes2)
+                        p.Kill();
+                    label1.Content = "Deleting old files";
+                    System.Threading.Thread.Sleep(1000);
+                }
+                else
+                    this.Close();
             label2.Opacity = 0;
             label1.Content = "Deleting old files";
             UpdaterBar.Value = 102;
             TaskbarItemInfo.ProgressValue = UpdaterBar.Value / 106d;
+            File.Delete("DS4Windows.exe");
             File.Delete("DS4Tool.exe");
             File.Delete("DS4Control.dll");
             File.Delete("DS4Library.dll");

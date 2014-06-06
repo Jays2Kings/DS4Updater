@@ -15,7 +15,6 @@ namespace Updater2
     /// </summary>
     public partial class App : Application
     {
-        protected string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Tool";
         string exepath = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
         public App()
         {
@@ -27,8 +26,8 @@ namespace Updater2
                         w.WriteLine("@echo off"); // Turn off echo
                         w.WriteLine("@echo Attempting to replace updater, please wait...");
                         w.WriteLine("@ping -n 4 127.0.0.1 > nul"); //Its silly but its the most compatible way to call for a timeout in a batch file, used to give the main updater time to cleanup and exit.
-                        w.WriteLine("@del \"" + exepath+ "\\Updater.exe" + "\""); // Out with the old
-                        w.WriteLine("@ren \"" + exepath+ "\\Updater NEW.exe" + "\" \"Updater.exe\""); // In with the new
+                        w.WriteLine("@del \"" + exepath+ "\\Updater.exe" + "\"");
+                        w.WriteLine("@ren \"" + exepath+ "\\Updater NEW.exe" + "\" \"Updater.exe\""); 
                         w.WriteLine("@DEL \"%~f0\""); // Attempt to delete myself without opening a time paradox.
                         w.Close();
 
