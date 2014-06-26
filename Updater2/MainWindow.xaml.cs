@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace Updater2
         double version, newversion;
         string exepath = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
         protected XmlDocument m_Xdoc = new XmlDocument();
-        bool newupdate, needsadmin = false;
+        bool newupdate;
 
         public bool AdminNeeded()
         {
@@ -57,6 +58,8 @@ namespace Updater2
                 label1.Content = "Please re-run with admin rights";
             else
             {
+                try { File.Delete(exepath + "\\Update.zip"); }
+                catch { label1.Content = "Cannot access Update.zip at this time"; return; }
                 Load();
                 if (!File.Exists(exepath + "\\version.txt") && !File.Exists(path + "\\version.txt"))
                 {
@@ -64,7 +67,7 @@ namespace Updater2
                     //Sorry other devs, gonna have to find your own server
                     WebClient wc2 = new WebClient();
                     wc.DownloadFile(urlv, exepath + "\\version.txt");
-                    if (double.TryParse(File.ReadAllText(exepath + "\\version.txt"), out newversion))
+                    if (double.TryParse(File.ReadAllText(exepath + "\\version.txt"), NumberStyles.Any, CultureInfo.InvariantCulture, out newversion))
                         if (newversion > version)
                             newupdate = true;
                         else
@@ -77,13 +80,13 @@ namespace Updater2
                 }
                 else if (File.Exists(path + "\\version.txt"))
                 {
-                    if (double.TryParse(File.ReadAllText(path + "\\version.txt"), out newversion))
+                    if (double.TryParse(File.ReadAllText(path + "\\version.txt"), NumberStyles.Any, CultureInfo.InvariantCulture, out newversion))
                         if (newversion > version)
                             newupdate = true;
                 }
                 else if (File.Exists(exepath + "\\version.txt"))
                 {
-                    if (double.TryParse(File.ReadAllText(exepath + "\\version.txt"), out newversion))
+                    if (double.TryParse(File.ReadAllText(exepath + "\\version.txt"), NumberStyles.Any, CultureInfo.InvariantCulture, out newversion))
                         if (newversion > version)
                             newupdate = true;
                 }
@@ -144,54 +147,75 @@ namespace Updater2
         private void wc_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
             sw.Reset();
-            Process[] processes = Process.GetProcessesByName("DS4Tool");
-            Process[] processes2 = Process.GetProcessesByName("DS4Windows");
-            label1.Content = "Download Complete";
-            if (processes.Length > 0 || processes2.Length > 0)
-                if (MessageBox.Show("It will be closed to contine this update.", "DS4Tool/DS4Windows is still running", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation) == MessageBoxResult.OK)
+            if (new FileInfo(exepath + "\\Update.zip").Length > 0)
+            {
+                Process[] processes = Process.GetProcessesByName("DS4Tool");
+                Process[] processes2 = Process.GetProcessesByName("DS4Windows");
+                label1.Content = "Download Complete";
+                if (processes.Length > 0 || processes2.Length > 0)
+                    if (MessageBox.Show("It will be closed to contine this update.", "DS4Tool/DS4Windows is still running", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation) == MessageBoxResult.OK)
+                    {
+                        foreach (Process p in processes)
+                            p.Kill();
+                        foreach (Process p in processes2)
+                            p.Kill();
+                        label1.Content = "Deleting old files";
+                        System.Threading.Thread.Sleep(5000);
+                    }
+                    else
+                        this.Close();
+                while (processes.Length + processes2.Length > 0)
                 {
-                    foreach (Process p in processes)
-                        p.Kill();
-                    foreach (Process p in processes2)
-                        p.Kill();
-                    label1.Content = "Deleting old files";
-                    System.Threading.Thread.Sleep(5000);
+                    label1.Content = "Waiting for DS4Windows to close";
+                    processes = Process.GetProcessesByName("DS4Tool");
+                    processes2 = Process.GetProcessesByName("DS4Windows");
+                    System.Threading.Thread.Sleep(10);
                 }
-                else
-                    this.Close();
-            label2.Opacity = 0;
-            label1.Content = "Deleting old files";
-            UpdaterBar.Value = 102;
-            TaskbarItemInfo.ProgressValue = UpdaterBar.Value / 106d;
-            File.Delete(exepath + "\\DS4Windows.exe");
-            File.Delete(exepath + "\\DS4Tool.exe");
-            File.Delete(exepath + "\\DS4Control.dll");
-            File.Delete(exepath + "\\DS4Library.dll");
-            File.Delete(exepath + "\\HidLibrary.dll");
-            label1.Content = "Installing new files";
-            UpdaterBar.Value = 104;
-            TaskbarItemInfo.ProgressValue = UpdaterBar.Value / 106d;
-            try { ZipFile.ExtractToDirectory(exepath + "\\Update.zip", Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName); }
-            catch (IOException) { } //Since profiles may be in the zip ignore them if already exists
-            File.Delete(path + "\\version.txt");
-            File.Delete(exepath + "\\version.txt");
-            File.Delete(exepath + "\\Update.zip");
-            label1.Content = "Update complete";
-            Save();
-            UpdaterBar.Value = 106;
-            TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
-            btnOpenDS4.IsEnabled = true;
+                label2.Opacity = 0;
+                label1.Content = "Deleting old files";
+                UpdaterBar.Value = 102;
+                TaskbarItemInfo.ProgressValue = UpdaterBar.Value / 106d;
+                File.Delete(exepath + "\\DS4Windows.exe");
+                File.Delete(exepath + "\\DS4Tool.exe");
+                File.Delete(exepath + "\\DS4Control.dll");
+                File.Delete(exepath + "\\DS4Library.dll");
+                File.Delete(exepath + "\\HidLibrary.dll");
+                label1.Content = "Installing new files";
+                UpdaterBar.Value = 104;
+                TaskbarItemInfo.ProgressValue = UpdaterBar.Value / 106d;
+                if (new FileInfo(exepath + "\\Update.zip").Length > 0)
+                    try { ZipFile.ExtractToDirectory(exepath + "\\Update.zip", Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName); }
+                    catch (IOException) { } //Since profiles may be in the zip ignore them if already exists
+                File.Delete(path + "\\version.txt");
+                File.Delete(exepath + "\\version.txt");
+                File.Delete(exepath + "\\Update.zip");
+                label1.Content = "Update complete";
+                Save();
+                UpdaterBar.Value = 106;
+                TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
+                btnOpenDS4.IsEnabled = true;
+            }
+            else
+            {
+                label1.Content = "Could not download update";
+                btnOpenDS4.IsEnabled = true;
+            }
         }
         protected string m_Profile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Tool\\Profiles.xml";
         public void Save()
         {
-            m_Xdoc.Load(m_Profile);
-            XmlNode Node = m_Xdoc.DocumentElement;
-            XmlNode oldxmlvesion = m_Xdoc.SelectSingleNode("/Profile/DS4Version");
-            XmlNode newxmlVersion = m_Xdoc.CreateNode(XmlNodeType.Element, "DS4Version", null);
-            newxmlVersion.InnerText = newversion.ToString();
-            Node.ReplaceChild(newxmlVersion, oldxmlvesion);
-            m_Xdoc.Save(m_Profile);
+            if (File.Exists(m_Profile))
+                try
+                {
+                    m_Xdoc.Load(m_Profile);
+                    XmlNode Node = m_Xdoc.DocumentElement;
+                    XmlNode oldxmlvesion = m_Xdoc.SelectSingleNode("/Profile/DS4Version");
+                    XmlNode newxmlVersion = m_Xdoc.CreateNode(XmlNodeType.Element, "DS4Version", null);
+                    newxmlVersion.InnerText = newversion.ToString();
+                    Node.ReplaceChild(newxmlVersion, oldxmlvesion);
+                    m_Xdoc.Save(m_Profile);
+                }
+                catch { }
         }
 
         public void Load()
