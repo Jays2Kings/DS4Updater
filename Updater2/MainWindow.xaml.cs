@@ -30,10 +30,11 @@ namespace Updater2
     /// </summary>
     public partial class MainWindow : Window
     {
-        WebClient wc = new WebClient();
+        WebClient wc = new WebClient(), subwc = new WebClient();
         protected string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Tool";
         string exepath = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
         string version = "0", newversion = "0";
+        bool downloading = false;
         protected XmlDocument m_Xdoc = new XmlDocument();
 
         public bool AdminNeeded()
@@ -72,11 +73,12 @@ namespace Updater2
                     Uri urlv = new Uri("https://dl.dropboxusercontent.com/u/16364552/DS4Windows/newest%20version.txt");
                     //Sorry other devs, gonna have to find your own server
                     WebClient wc2 = new WebClient();
-                    wc.DownloadFile(urlv, exepath + "\\version.txt");
-                    newversion = File.ReadAllText(exepath + "\\version.txt");
-                    File.Delete(exepath + "\\version.txt");
+                    downloading = true;
+                    subwc.DownloadFileAsync(urlv, exepath + "\\version.txt");
+                    subwc.DownloadFileCompleted += subwc_DownloadFileCompleted;
+                    label1.Content = "Getting Update info";
                 }             
-                if (version.Replace(',', '.').CompareTo(newversion) == -1)
+                if (!downloading && version.Replace(',', '.').CompareTo(newversion) == -1)
                 {
                     Uri url = new Uri("https://dl.dropboxusercontent.com/u/16364552/DS4Windows/DS4Windows%20-%20J2K%20%28v" + newversion + "%29.zip");
                     //Sorry other devs, gonna have to find your own server
@@ -86,7 +88,7 @@ namespace Updater2
                     wc.DownloadFileCompleted += wc_DownloadFileCompleted;
                     wc.DownloadProgressChanged += wc_DownloadProgressChanged;
                 }
-                else
+                else if (!downloading)
                 {
                     label1.Content = "DS4Tool is up to date";
                     try
@@ -100,7 +102,34 @@ namespace Updater2
             }
         }
 
-        public bool IsAdministrator()
+        void subwc_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            newversion = File.ReadAllText(exepath + "\\version.txt");
+            File.Delete(exepath + "\\version.txt");
+            if (version.Replace(',', '.').CompareTo(newversion) == -1)
+            {
+                Uri url = new Uri("https://dl.dropboxusercontent.com/u/16364552/DS4Windows/DS4Windows%20-%20J2K%20%28v" + newversion + "%29.zip");
+                //Sorry other devs, gonna have to find your own server
+                sw.Start();
+                try { wc.DownloadFileAsync(url, exepath + "\\Update.zip"); }
+                catch (Exception ec) { label1.Content = ec.Message; }
+                wc.DownloadFileCompleted += wc_DownloadFileCompleted;
+                wc.DownloadProgressChanged += wc_DownloadProgressChanged;
+            }
+            else
+            {
+                label1.Content = "DS4Tool is up to date";
+                try
+                {
+                    File.Delete(path + "\\version.txt");
+                    File.Delete(exepath + "\\version.txt");
+                }
+                catch { }
+                btnOpenDS4.IsEnabled = true;
+            }
+        }
+
+        private bool IsAdministrator()
         {
             var identity = WindowsIdentity.GetCurrent();
             var principal = new WindowsPrincipal(identity);
@@ -173,21 +202,7 @@ namespace Updater2
                 label1.Content = "Installing new files";
                 UpdaterBar.Value = 104;
                 TaskbarItemInfo.ProgressValue = UpdaterBar.Value / 106d;
-                //string zipPath = exepath + "\\Update.zip";
-                /*try
-                {
-                    // Opens existing zip file
-                    ZipStorer zip = ZipStorer.Open(exepath + "\\Update.zip", FileAccess.Read);
-                    // Read all directory contents
-                    List<ZipStorer.ZipFileEntry> dir = zip.ReadCentralDir();
-                    // Extract all files in target directory
-                    foreach (ZipStorer.ZipFileEntry entry in dir)
-                        zip.ExtractFile(entry, exepath + "\\" + System.IO.Path.GetFileName(entry.FilenameInZip));
-                    zip.Close();
-                }
-                catch (InvalidDataException)
-                { }*/
-                try { ZipFile.ExtractToDirectory(exepath + "\\Update.zip", exepath);}
+                try { ZipFile.ExtractToDirectory(exepath + "\\Update.zip", exepath); }
                 catch (IOException) { }
                 try
                 {
@@ -195,7 +210,13 @@ namespace Updater2
                     File.Delete(path + "\\version.txt");
                 }
                 catch { }
-                if ((File.Exists(exepath + "\\DS4Windows.exe") || File.Exists(exepath + "\\DS4Tool.exe")) && 
+
+                string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+                if (System.IO.File.Exists(exepath + "\\DS4Updater NEW.exe")
+                    && FileVersionInfo.GetVersionInfo(exepath + "\\DS4Updater NEW.exe").FileVersion.CompareTo(version) != 1)
+                    System.IO.File.Delete(exepath + "\\DS4Updater NEW.exe");
+
+                if ((File.Exists(exepath + "\\DS4Windows.exe") || File.Exists(exepath + "\\DS4Tool.exe")) &&
                     FileVersionInfo.GetVersionInfo(exepath + "\\DS4Windows.exe").FileVersion == newversion)
                 {
                     File.Delete(exepath + "\\Update.zip");
@@ -214,6 +235,12 @@ namespace Updater2
             else
             {
                 label1.Content = "Could not download update";
+                try
+                {
+                    File.Delete(exepath + "\\version.txt");
+                    File.Delete(path + "\\version.txt");
+                }
+                catch { }
                 btnOpenDS4.IsEnabled = true;
             }
         }
@@ -227,8 +254,8 @@ namespace Updater2
         private void btnOpenDS4_Click(object sender, RoutedEventArgs e)
         {
             if (File.Exists(exepath + "\\DS4Windows.exe") || File.Exists(exepath + "\\DS4Tool.exe"))
-                try { Process.Start("DS4Tool.exe"); }
-                catch { Process.Start("DS4Windows.exe"); }
+                try { Process.Start(exepath + "\\DS4Tool.exe"); }
+                catch { Process.Start(exepath + "\\DS4Windows.exe"); }
             else
                 Process.Start(exepath);
             this.Close();
