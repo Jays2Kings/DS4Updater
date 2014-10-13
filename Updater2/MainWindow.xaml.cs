@@ -70,7 +70,7 @@ namespace Updater2
                     newversion = File.ReadAllText(exepath + "\\version.txt");
                 else
                 {
-                    Uri urlv = new Uri("https://dl.dropboxusercontent.com/u/16364552/DS4Windows/newest%20version.txt");
+                    Uri urlv = new Uri("http://ds4windows.com/Files/Builds/newest.txt");
                     //Sorry other devs, gonna have to find your own server
                     WebClient wc2 = new WebClient();
                     downloading = true;
@@ -80,7 +80,7 @@ namespace Updater2
                 }             
                 if (!downloading && version.Replace(',', '.').CompareTo(newversion) == -1)
                 {
-                    Uri url = new Uri("https://dl.dropboxusercontent.com/u/16364552/DS4Windows/DS4Windows%20-%20J2K%20%28v" + newversion + "%29.zip");
+                    Uri url = new Uri("http://ds4windows.com/Files/Builds/DS4Windows%20-%20J2K%20(v" + newversion + ").zip");
                     //Sorry other devs, gonna have to find your own server
                     sw.Start();
                     try { wc.DownloadFileAsync(url, exepath + "\\Update.zip"); }
@@ -108,7 +108,7 @@ namespace Updater2
             File.Delete(exepath + "\\version.txt");
             if (version.Replace(',', '.').CompareTo(newversion) == -1)
             {
-                Uri url = new Uri("https://dl.dropboxusercontent.com/u/16364552/DS4Windows/DS4Windows%20-%20J2K%20%28v" + newversion + "%29.zip");
+                Uri url = new Uri("http://ds4windows.com/Files/Builds/DS4Windows%20-%20J2K%20(v" + newversion + ").zip");
                 //Sorry other devs, gonna have to find your own server
                 sw.Start();
                 try { wc.DownloadFileAsync(url, exepath + "\\Update.zip"); }
@@ -177,7 +177,10 @@ namespace Updater2
                         System.Threading.Thread.Sleep(5000);
                     }
                     else
+                    {
                         this.Close();
+                        return;
+                    }
                 while (processes.Length + processes2.Length > 0)
                 {
                     label1.Content = "Waiting for DS4Windows to close";
