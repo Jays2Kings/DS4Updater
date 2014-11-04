@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -19,6 +20,8 @@ namespace Updater2
         string exepath = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
         public App()
         {
+        //Console.WriteLine(CultureInfo.CurrentCulture);
+
         this.Exit += (s, e) =>
                 {
                     string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;

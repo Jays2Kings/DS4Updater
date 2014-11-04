@@ -30,12 +30,14 @@ namespace Updater2
     /// </summary>
     public partial class MainWindow : Window
     {
-        WebClient wc = new WebClient(), subwc = new WebClient();
+        WebClient wc = new WebClient(), subwc = new WebClient(), langwc = new WebClient();
         protected string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Tool";
         string exepath = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
         string version = "0", newversion = "0";
         bool downloading = false;
         protected XmlDocument m_Xdoc = new XmlDocument();
+        protected string m_Profile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Tool\\Profiles.xml";
+        private bool roundOne = true;
 
         public bool AdminNeeded()
         {
@@ -155,12 +157,33 @@ namespace Updater2
             else convertedrev = (int)(e.BytesReceived / 1024d) + "kB";
             if (e.TotalBytesToReceive > 1024 * 1024 * 5) convertedtotal = (int)(e.TotalBytesToReceive / 1024d / 1024d) + "MB";
             else convertedtotal = (int)(e.TotalBytesToReceive / 1024d) + "kB";
-            label1.Content = "Downloading update: " + convertedrev + " / " + convertedtotal;
+            if (roundOne) label1.Content = "Downloading update: " + convertedrev + " / " + convertedtotal;
+            else label1.Content = "Downloading Laugauge Pack: " + convertedrev + " / " + convertedtotal;
         }
 
         private void wc_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
         {
             sw.Reset();
+            string lang = CultureInfo.CurrentCulture.ToString();
+            if (roundOne)
+            {
+                Uri i = new Uri("http://ds4windows.com/Files/" + lang + ".zip");
+                sw.Start();
+                wc.DownloadFileAsync(i, exepath + "\\" + lang + ".zip");
+                roundOne = false; 
+                return;
+            }
+            if (!roundOne)
+            {
+                
+                if (new FileInfo(exepath + "\\" + lang + ".zip").Length > 0)
+                {
+                    try { Directory.Delete(exepath + "\\" + lang); }
+                    catch { }
+                    try { ZipFile.ExtractToDirectory(exepath + "\\" + lang + ".zip", exepath); }
+                    catch (IOException) { }
+                }
+            }
             if (new FileInfo(exepath + "\\Update.zip").Length > 0)
             {
                 Process[] processes = Process.GetProcessesByName("DS4Tool");
@@ -199,7 +222,7 @@ namespace Updater2
                     File.Delete(exepath + "\\DS4Control.dll");
                     File.Delete(exepath + "\\DS4Library.dll");
                     File.Delete(exepath + "\\HidLibrary.dll");
-                    File.Delete(exepath + "DS4Updater NEW.exe");
+                    File.Delete(exepath + "\\DS4Updater NEW.exe");
                 }
                 catch { }
                 label1.Content = "Installing new files";
@@ -223,6 +246,7 @@ namespace Updater2
                     FileVersionInfo.GetVersionInfo(exepath + "\\DS4Windows.exe").FileVersion == newversion)
                 {
                     File.Delete(exepath + "\\Update.zip");
+                    File.Delete(exepath + "\\" + lang + ".zip"); 
                     label1.Content = "DS4Windows has been updated to v" + newversion;
                 }
                 else if (File.Exists(exepath + "\\DS4Windows.exe") || File.Exists(exepath + "\\DS4Tool.exe"))
@@ -247,7 +271,6 @@ namespace Updater2
                 btnOpenDS4.IsEnabled = true;
             }
         }
-        protected string m_Profile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Tool\\Profiles.xml";
 
         private void btnChangelog_Click(object sender, RoutedEventArgs e)
         {
