@@ -58,6 +58,7 @@ namespace Updater2
             InitializeComponent();
             if (File.Exists(exepath + "\\DS4Windows.exe"))
                 version = FileVersionInfo.GetVersionInfo(exepath + "\\DS4Windows.exe").FileVersion;
+            return;
             if (AdminNeeded())
                 label1.Content = "Please re-run with admin rights";
             else
@@ -186,16 +187,13 @@ namespace Updater2
             }
             if (new FileInfo(exepath + "\\Update.zip").Length > 0)
             {
-                Process[] processes = Process.GetProcessesByName("DS4Tool");
-                Process[] processes2 = Process.GetProcessesByName("DS4Windows");
+                Process[] processes = Process.GetProcessesByName("DS4Windows");
                 label1.Content = "Download Complete";
-                if (processes.Length > 0 || processes2.Length > 0)
-                    if (MessageBox.Show("It will be closed to contine this update.", "DS4Tool/DS4Windows is still running", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation) == MessageBoxResult.OK)
+                if (processes.Length > 0)
+                    if (MessageBox.Show("It will be closed to continue this update.", "DS4Windows is still running", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation) == MessageBoxResult.OK)
                     {
                         label1.Content = "Deleting old files";
                         foreach (Process p in processes)
-                            p.Kill();
-                        foreach (Process p in processes2)
                             p.Kill();
                         System.Threading.Thread.Sleep(5000);
                     }
@@ -204,11 +202,10 @@ namespace Updater2
                         this.Close();
                         return;
                     }
-                while (processes.Length + processes2.Length > 0)
+                while (processes.Length > 0)
                 {
                     label1.Content = "Waiting for DS4Windows to close";
-                    processes = Process.GetProcessesByName("DS4Tool");
-                    processes2 = Process.GetProcessesByName("DS4Windows");
+                    processes = Process.GetProcessesByName("DS4Windows");
                     System.Threading.Thread.Sleep(10);
                 }
                 label2.Opacity = 0;
@@ -218,11 +215,11 @@ namespace Updater2
                 try
                 {
                     File.Delete(exepath + "\\DS4Windows.exe");
+                    File.Delete(exepath + "\\DS4Updater NEW.exe");
                     File.Delete(exepath + "\\DS4Tool.exe");
                     File.Delete(exepath + "\\DS4Control.dll");
                     File.Delete(exepath + "\\DS4Library.dll");
                     File.Delete(exepath + "\\HidLibrary.dll");
-                    File.Delete(exepath + "\\DS4Updater NEW.exe");
                 }
                 catch { }
                 label1.Content = "Installing new files";
