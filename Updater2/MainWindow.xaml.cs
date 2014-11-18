@@ -58,7 +58,6 @@ namespace Updater2
             InitializeComponent();
             if (File.Exists(exepath + "\\DS4Windows.exe"))
                 version = FileVersionInfo.GetVersionInfo(exepath + "\\DS4Windows.exe").FileVersion;
-            return;
             if (AdminNeeded())
                 label1.Content = "Please re-run with admin rights";
             else
