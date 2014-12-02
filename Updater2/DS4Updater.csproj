@@ -37,9 +37,13 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\DS4.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\DS4W Update.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup />
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -106,6 +110,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\DS4.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="DS4W Update.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DS4W Update.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
