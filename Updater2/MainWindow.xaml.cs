@@ -37,7 +37,7 @@ namespace Updater2
         bool downloading = false;
         protected XmlDocument m_Xdoc = new XmlDocument();
         protected string m_Profile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Tool\\Profiles.xml";
-        private bool roundOne = true;
+        private int round = 1;
 
         public bool AdminNeeded()
         {
@@ -157,7 +157,7 @@ namespace Updater2
             else convertedrev = (int)(e.BytesReceived / 1024d) + "kB";
             if (e.TotalBytesToReceive > 1024 * 1024 * 5) convertedtotal = (int)(e.TotalBytesToReceive / 1024d / 1024d) + "MB";
             else convertedtotal = (int)(e.TotalBytesToReceive / 1024d) + "kB";
-            if (roundOne) label1.Content = "Downloading update: " + convertedrev + " / " + convertedtotal;
+            if (round == 1) label1.Content = "Downloading update: " + convertedrev + " / " + convertedtotal;
             else label1.Content = "Downloading Laugauge Pack: " + convertedrev + " / " + convertedtotal;
         }
 
@@ -165,17 +165,35 @@ namespace Updater2
         {
             sw.Reset();
             string lang = CultureInfo.CurrentCulture.ToString();
-            if (roundOne)
+            if (round == 1)
             {
                 Uri i = new Uri("http://ds4windows.com/Files/" + lang + ".zip");
                 sw.Start();
                 wc.DownloadFileAsync(i, exepath + "\\" + lang + ".zip");
-                roundOne = false; 
+                round = 2; 
                 return;
             }
-            if (!roundOne)
+            if (round == 2)
+            {                
+                if (new FileInfo(exepath + "\\" + lang + ".zip").Length > 0)
+                {
+                    try { Directory.Delete(exepath + "\\" + lang); }
+                    catch { }
+                    try { ZipFile.ExtractToDirectory(exepath + "\\" + lang + ".zip", exepath); }
+                    catch (IOException) { }
+                }
+                else
+                {
+                    File.Delete(exepath + "\\" + lang + ".zip");
+                    Uri i = new Uri("http://ds4windows.com/Files/" + lang.Split('-')[0] + ".zip");
+                    sw.Start();
+                    wc.DownloadFileAsync(i, exepath + "\\" + lang + ".zip");
+                    round = 3;
+                    return;
+                }
+            }
+            if (round == 3)
             {
-                
                 if (new FileInfo(exepath + "\\" + lang + ".zip").Length > 0)
                 {
                     try { Directory.Delete(exepath + "\\" + lang); }
@@ -275,9 +293,8 @@ namespace Updater2
 
         private void btnOpenDS4_Click(object sender, RoutedEventArgs e)
         {
-            if (File.Exists(exepath + "\\DS4Windows.exe") || File.Exists(exepath + "\\DS4Tool.exe"))
-                try { Process.Start(exepath + "\\DS4Tool.exe"); }
-                catch { Process.Start(exepath + "\\DS4Windows.exe"); }
+            if (File.Exists(exepath + "\\DS4Windows.exe"))
+                Process.Start(exepath + "\\DS4Windows.exe");
             else
                 Process.Start(exepath);
             this.Close();
