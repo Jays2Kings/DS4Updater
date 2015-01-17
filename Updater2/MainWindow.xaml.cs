@@ -237,6 +237,10 @@ namespace Updater2
                     File.Delete(exepath + "\\DS4Control.dll");
                     File.Delete(exepath + "\\DS4Library.dll");
                     File.Delete(exepath + "\\HidLibrary.dll");
+                    string[] updatefiles = Directory.GetFiles(exepath);
+                    for (int i = 0; i < updatefiles.Length; i++)
+                        if (System.IO.Path.GetExtension(updatefiles[i]) == ".ds4w")
+                            File.Delete(updatefiles[i]);
                 }
                 catch { }
                 label1.Content = "Installing new files";
