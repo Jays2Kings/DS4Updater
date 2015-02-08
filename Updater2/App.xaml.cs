@@ -18,10 +18,20 @@ namespace Updater2
     public partial class App : Application
     {
         string exepath = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            MainWindow mwd = new MainWindow();
+            if (e.Args.Length == 1)
+            {
+                if (e.Args[0].Contains("-skipLang"))
+                    mwd.downloadLang = false;
+            }
+            mwd.Show();
+        }
+
         public App()
         {
         //Console.WriteLine(CultureInfo.CurrentCulture);
-
         this.Exit += (s, e) =>
                 {
                     string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
