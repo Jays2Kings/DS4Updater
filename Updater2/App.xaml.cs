@@ -18,6 +18,7 @@ namespace Updater2
     public partial class App : Application
     {
         string exepath = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
+        public static bool openingDS4W;
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             MainWindow mwd = new MainWindow();
@@ -35,9 +36,11 @@ namespace Updater2
         this.Exit += (s, e) =>
                 {
                     string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
-                    if (System.IO.File.Exists(exepath + "\\DS4Updater NEW.exe")
-                        && FileVersionInfo.GetVersionInfo(exepath + "\\DS4Updater NEW.exe").FileVersion.CompareTo(version) == 1)
+                    if (!openingDS4W && System.IO.File.Exists(exepath + "\\Update Files\\DS4Updater.exe")
+                        && FileVersionInfo.GetVersionInfo(exepath + "\\Update Files\\DS4Updater.exe").FileVersion.CompareTo(version) == 1)
                     {
+                        File.Move(exepath + "\\Update Files\\DS4Updater.exe", exepath + "\\DS4Updater NEW.exe");
+                        Directory.Delete(exepath + "\\Update Files");
                         StreamWriter w = new StreamWriter(exepath + "\\UpdateReplacer.bat");
                         w.WriteLine("@echo off"); // Turn off echo
                         w.WriteLine("@echo Attempting to replace updater, please wait...");

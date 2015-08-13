@@ -1,13 +1,13 @@
 ﻿<Window x:Name="DS4_Updater" x:Class="Updater2.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="DS4 Updater" Height="110" Width="391.566" ResizeMode="CanMinimize">
+        Title="DS4 Updater" Height="110" Width="408.566" ResizeMode="CanMinimize">
 
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo ProgressValue="0" ProgressState="Normal"/>
     </Window.TaskbarItemInfo>
     <Grid>
-        <Button x:Name="btnOpenDS4" Content="Open DS4" HorizontalAlignment="Left" Margin="290,41,0,0" VerticalAlignment="Top" Width="75" IsEnabled="False" Click="btnOpenDS4_Click"/>
+        <Button x:Name="btnOpenDS4" Content="Open DS4W" HorizontalAlignment="Left" Margin="290,41,0,0" VerticalAlignment="Top" Width="86" IsEnabled="False" Click="btnOpenDS4_Click" Background="#FFF0F0F0"/>
         <Button x:Name="btnChangelog" Content="View Changelog" HorizontalAlignment="Left" Margin="186,41,0,0" VerticalAlignment="Top" Width="99" Click="btnChangelog_Click"/>
         <ProgressBar x:Name="UpdaterBar" HorizontalAlignment="Left" Height="20" Margin="10,41,0,0" VerticalAlignment="Top" Width="171" Maximum="106"/>
         <Label x:Name="label1" Content="Fetching Download" HorizontalAlignment="Left" Margin="5,10,0,0" VerticalAlignment="Top"/>
