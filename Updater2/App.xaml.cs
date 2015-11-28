@@ -36,11 +36,11 @@ namespace Updater2
         this.Exit += (s, e) =>
                 {
                     string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
-                    if (!openingDS4W && System.IO.File.Exists(exepath + "\\Update Files\\DS4Updater.exe")
+                    if (!openingDS4W && File.Exists(exepath + "\\Update Files\\DS4Updater.exe")
                         && FileVersionInfo.GetVersionInfo(exepath + "\\Update Files\\DS4Updater.exe").FileVersion.CompareTo(version) == 1)
                     {
                         File.Move(exepath + "\\Update Files\\DS4Updater.exe", exepath + "\\DS4Updater NEW.exe");
-                        Directory.Delete(exepath + "\\Update Files");
+                        Directory.Delete(exepath + "\\Update Files", true);
                         StreamWriter w = new StreamWriter(exepath + "\\UpdateReplacer.bat");
                         w.WriteLine("@echo off"); // Turn off echo
                         w.WriteLine("@echo Attempting to replace updater, please wait...");
@@ -50,11 +50,15 @@ namespace Updater2
                         w.WriteLine("@DEL \"%~f0\""); // Attempt to delete myself without opening a time paradox.
                         w.Close();
 
-                        System.Diagnostics.Process.Start(exepath + "\\UpdateReplacer.bat");
+                        Process.Start(exepath + "\\UpdateReplacer.bat");
                     }
-                    else if (System.IO.File.Exists(exepath + "\\DS4Updater NEW.exe"))
-                        System.IO.File.Delete(exepath + "\\DS4Updater NEW.exe");
-               };
+                    else if (File.Exists(exepath + "\\DS4Updater NEW.exe"))
+                        File.Delete(exepath + "\\DS4Updater NEW.exe");
+                    if (File.Exists(exepath + "\\DS4Updater NEW.exe"))
+                        File.Delete(exepath + "\\DS4Updater NEW.exe");
+                    if (Directory.Exists(exepath + "\\Update Files"))
+                        Directory.Delete(exepath + "\\Update Files", true);
+                };
         }
     }
 }
