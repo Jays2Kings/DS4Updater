@@ -74,9 +74,7 @@ namespace Updater2
                     }
                     else if (File.Exists(exepath + "\\DS4Updater NEW.exe"))
                         File.Delete(exepath + "\\DS4Updater NEW.exe");
-                    if (File.Exists(exepath + "\\DS4Updater NEW.exe"))
-                        File.Delete(exepath + "\\DS4Updater NEW.exe");
-                    if (Directory.Exists(exepath + "\\Update Files"))
+                    if (!openingDS4W && Directory.Exists(exepath + "\\Update Files"))
                         Directory.Delete(exepath + "\\Update Files", true);
                 };
         }
