@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Xml;
 
 namespace Updater2
 {
@@ -26,6 +27,25 @@ namespace Updater2
             {
                 if (e.Args[0].Contains("-skipLang"))
                     mwd.downloadLang = false;
+            }
+            else if (!CultureInfo.CurrentCulture.ToString().StartsWith("en"))
+            {
+                try
+                {
+                    string m_Profile;
+                    if (File.Exists(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName + "\\Profiles.xml"))
+                        m_Profile = Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName + "\\Profiles.xml";
+                    else
+                        m_Profile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Windows\\Auto Profiles.xml";
+                    if (File.Exists(m_Profile))
+                    {
+                        XmlDocument m_Xdoc = new XmlDocument();
+                        m_Xdoc.Load(m_Profile);
+                        XmlNode Item = m_Xdoc.SelectSingleNode("/Profile/DownloadLang");
+                        bool.TryParse(Item.InnerText, out mwd.downloadLang);
+                    }
+                }
+                catch { }
             }
             mwd.Show();
         }
