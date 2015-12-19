@@ -39,6 +39,7 @@ namespace Updater2
         protected string m_Profile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DS4Tool\\Profiles.xml";
         private int round = 1;
         public bool downloadLang = true;
+        private bool backup;
         public bool AdminNeeded()
         {
             try
@@ -88,7 +89,6 @@ namespace Updater2
                 if (!downloading && version.Replace(',', '.').CompareTo(newversion) == -1)
                 {
                     Uri url = new Uri($"http://github.com/Jays2Kings/DS4Windows/releases/download/v{newversion}/DS4Windows.zip");
-                    //Uri url = new Uri("http://ds4windows.com/Files/Builds/DS4Windows%20-%20J2K%20(v" + newversion + ").zip");
                     sw.Start();
                     try { wc.DownloadFileAsync(url, exepath + "\\Update.zip"); }
                     catch (Exception e) { label1.Content = e.Message; }
@@ -270,7 +270,7 @@ namespace Updater2
                 if (File.Exists(exepath + "\\Update Files\\DS4Updater NEW.exe"))
                     File.Move(exepath + "\\Update Files\\DS4Updater NEW.exe", exepath + "\\Update Files\\DS4Updater.exe");
                 string[] files = Directory.GetFiles(exepath + "\\Update Files");
-                for (int i = files.Length -1; i >= 0; i--)
+                for (int i = files.Length - 1; i >= 0; i--)
                     if (System.IO.Path.GetFileNameWithoutExtension(files[i]) != "DS4Updater")
                         File.Move(files[i], $"{exepath}\\{System.IO.Path.GetFileName(files[i])}");
                 string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
@@ -284,7 +284,7 @@ namespace Updater2
                     FileVersionInfo.GetVersionInfo(exepath + "\\DS4Windows.exe").FileVersion == newversion)
                 {
                     File.Delete(exepath + "\\Update.zip");
-                    File.Delete(exepath + "\\" + lang + ".zip"); 
+                    File.Delete(exepath + "\\" + lang + ".zip");
                     label1.Content = $"DS4Windows has been updated to v{newversion}";
                 }
                 else if (File.Exists(exepath + "\\DS4Windows.exe") || File.Exists(exepath + "\\DS4Tool.exe"))
@@ -296,6 +296,14 @@ namespace Updater2
                 UpdaterBar.Value = 106;
                 TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
                 btnOpenDS4.IsEnabled = true;
+            }
+            else if (!backup)
+            {
+                Uri url = new Uri($"http://ds4windows.com/DS4Windows.zip");
+                sw.Start();
+                try { wc.DownloadFileAsync(url, exepath + "\\Update.zip"); }
+                catch (Exception ex) { label1.Content = ex.Message; }
+                backup = true;
             }
             else
             {
